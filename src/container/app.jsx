@@ -27,7 +27,7 @@ class App extends Component {
         const ctx = canvas.getContext('2d')
         const img = document.getElementById('img')
         img.onload = () => {
-            this.setState({ style: window.getComputedStyle(img) })
+            // this.setState({ style: window.getComputedStyle(img) })
             const ws = window.getComputedStyle(img).width.replace('px', '')
             const hs = window.getComputedStyle(img).height.replace('px', '')
             canvas.width = ws
@@ -38,9 +38,9 @@ class App extends Component {
             })
             const radio = this.getPixelRatio(ctx)
             this.setState({ radio })
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height )
             const originData = ctx.getImageData(0, 0, ws, hs).data
-            this.setState({ imgData: ctx.getImageData(0, 0, ws, hs) })
+            this.setState({ imgData: ctx.getImageData(0, 0, ws * radio, hs * radio) })
             console.log(ctx.getImageData(0, 0, ws, hs))
             this.setState({ originData })
         }
@@ -143,9 +143,11 @@ class App extends Component {
     }
     
     render () {
+        
+        const { width, height, radio } = this.state
         const canvasStyle = {
-            width: this.state.width + 'px',
-            height: this.state.height + 'px'
+            width: width + 'px',
+            height: height + 'px'
         }
         return (
             <div className = "appWrapper">
@@ -163,8 +165,8 @@ class App extends Component {
                     <img id="img" src={this.state.path} />
                     {/* <div className="mask"></div> */}
                 </div>
-                {/* <canvas id = "canvas" width={this.state.width*2} height={this.state.height*2} style={canvasStyle}></canvas> */}
-                <canvas id = "canvas" style={canvasStyle}></canvas>
+                <canvas id = "canvas" width={width*radio} height={height*radio} style={canvasStyle}></canvas>
+                {/* <canvas id = "canvas" style={canvasStyle}></canvas> */}
 
             </div>
         )
