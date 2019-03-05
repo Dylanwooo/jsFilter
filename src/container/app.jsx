@@ -7,9 +7,10 @@ import Darken from './../lib/darken'
 import Aging from './../lib/agingStyle'
 import EmbossMent from './../lib/embossment'
 import Mosaic from './../lib/mosaic'
-
+import Revert from './../lib/revert'
+import Opacity from './../lib/opacity'
 import './app.scss'
-
+let rawImage
 class App extends Component {
 
     state = {
@@ -20,7 +21,8 @@ class App extends Component {
         data: null,
         path: '',
         radio: 1,
-        base64Img: ''
+        base64Img: '',
+        color: ''
     }
     componentDidMount() {
         const canvas = document.getElementById('canvas')
@@ -40,11 +42,25 @@ class App extends Component {
             this.setState({ radio })
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height )
             const originData = ctx.getImageData(0, 0, ws, hs).data
+            rawImage = ctx.getImageData(0, 0, ws * radio, hs * radio)
             this.setState({ imgData: ctx.getImageData(0, 0, ws * radio, hs * radio) })
             console.log(ctx.getImageData(0, 0, ws, hs))
             this.setState({ originData })
         }
+        canvas.addEventListener('mousemove', this.canvasPicker)
+
     }
+    canvasPicker = (e) => {
+        const canvas = document.getElementById('canvas')
+        const ctx = canvas.getContext('2d')
+        var x = e.layerX
+        var y = e.layerY
+        var pixel = ctx.getImageData(x, y, 1, 1)
+        var data = pixel.data
+        var rgba = 'rgb(' + data[0] + ',' + data[1] + ',' + data[2] + ')'
+        this.setState({ color: rgba })
+    }
+
     // 获取canvas宽展比例，解决canvas中分辨率低的问题
     getPixelRatio = (context) => {
         var backingStore = context.backingStorePixelRatio ||
@@ -98,14 +114,38 @@ class App extends Component {
         const processImg = EmbossMent(imgData)
         ctx.putImageData(processImg, 0, 0)
     }
-
+    // 马赛克
     handleMosaic = () => {
         const canvas = document.getElementById('canvas')
         const ctx = canvas.getContext('2d')
         let imgData = this.state.imgData
-        const processImg = Mosaic(imgData, 5)
+        const processImg = Mosaic(imgData, 30)
         ctx.putImageData(processImg, 0, 0)
     }
+    // 反色
+    handleRevert = () => {
+        const canvas = document.getElementById('canvas')
+        const ctx = canvas.getContext('2d')
+        let _imgData = this.state.imgData
+        const processImg = Revert(_imgData)
+        ctx.putImageData(processImg, 0, 0)
+    }
+    // 半透明
+    handleOpacity = () => {
+        const canvas = document.getElementById('canvas')
+        const ctx = canvas.getContext('2d')
+        let _imgData = this.state.imgData
+        const processImg = Opacity(_imgData, 0.5)
+        ctx.putImageData(processImg, 0, 0)
+    }
+
+    // 还原
+    handleBack = () => {
+        const canvas = document.getElementById('canvas')
+        const ctx = canvas.getContext('2d')
+        ctx.putImageData(rawImage, 0, 0)
+    }
+
     // 读取图像元信息
     handleFileChange = (e) => {
         // if (!file) return
@@ -122,7 +162,6 @@ class App extends Component {
           }, false)
         reader.readAsDataURL(file)
         
-        console.log(window.URL.createObjectURL(input.files[0]))
         // 兼容性
         const URL = window.URL || window.webkitURL
         this.setState({ 
@@ -144,10 +183,13 @@ class App extends Component {
     
     render () {
         
-        const { width, height, radio } = this.state
+        const { width, height, radio, color } = this.state
         const canvasStyle = {
             width: width + 'px',
             height: height + 'px'
+        }
+        const colorPicker = {
+            color: color
         }
         return (
             <div className = "appWrapper">
@@ -157,17 +199,19 @@ class App extends Component {
                 <button onClick={this.handleSharpen}>锐化</button>
                 <button onClick={this.handleMosaic}>马赛克</button>
                 <button onClick={this.handleEmbossing}>浮雕风格</button>
+                <button onClick={this.handleRevert}>反色</button>
+                <button onClick={this.handleOpacity}>半透明</button>
+                <button onClick={this.handleBack}>原图</button>
                 <div>
                     <input type="file" accept="image/png, image/jpeg, image/jpg" onChange={this.handleFileChange} />
                 </div>
-                {/* <div className="upload" onClick={this.upload}>upload</div> */}
-                <div>
+                <div className="img-wrap">
                     <img id="img" src={this.state.path} />
-                    {/* <div className="mask"></div> */}
                 </div>
-                <canvas id = "canvas" width={width*radio} height={height*radio} style={canvasStyle}></canvas>
-                {/* <canvas id = "canvas" style={canvasStyle}></canvas> */}
-
+                <p style={colorPicker}>颜色选择器</p>
+                <div className="canvas-wrap">
+                    <canvas id = "canvas" width={width*radio} height={height*radio} style={canvasStyle} ></canvas>
+                </div>
             </div>
         )
     }

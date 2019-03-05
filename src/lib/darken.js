@@ -1,4 +1,5 @@
 /**
+ * 黑白风格
  * @param {Object} imageData  imageData对象 
  */
 
