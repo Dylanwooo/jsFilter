@@ -6,6 +6,7 @@ import OilPainting from './../lib/oilPaint'
 import Darken from './../lib/darken'
 import Aging from './../lib/agingStyle'
 import EmbossMent from './../lib/embossment'
+import Mosaic from './../lib/mosaic'
 
 import './app.scss'
 
@@ -98,6 +99,13 @@ class App extends Component {
         ctx.putImageData(processImg, 0, 0)
     }
 
+    handleMosaic = () => {
+        const canvas = document.getElementById('canvas')
+        const ctx = canvas.getContext('2d')
+        let imgData = this.state.imgData
+        const processImg = Mosaic(imgData, 5)
+        ctx.putImageData(processImg, 0, 0)
+    }
     // 读取图像元信息
     handleFileChange = (e) => {
         // if (!file) return
@@ -141,11 +149,11 @@ class App extends Component {
         }
         return (
             <div className = "appWrapper">
-                {/* <img id="img" src={lena} /> */}
                 <button onClick={this.handleAging}>复古风格</button>
                 <button onClick={this.handleAshing}>黑白风格</button>
                 <button onClick={this.handleIolPanit}>油画风格</button>
                 <button onClick={this.handleSharpen}>锐化</button>
+                <button onClick={this.handleMosaic}>马赛克</button>
                 <button onClick={this.handleEmbossing}>浮雕风格</button>
                 <div>
                     <input type="file" accept="image/png, image/jpeg, image/jpg" onChange={this.handleFileChange} />

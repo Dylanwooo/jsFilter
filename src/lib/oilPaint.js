@@ -1,6 +1,8 @@
 /**
  * 油画风格
  * @param {Object} imageData  imageData对象 
+ * @param {Number} range 模糊范围
+ * @param {Number} levels 模糊程度
  */
 
  // TODO
