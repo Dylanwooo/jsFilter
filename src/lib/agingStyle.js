@@ -4,6 +4,7 @@
  */
 
 function Aging (imageData) {
+    
     let index, r, g, b
     const data = imageData.data
     const width = imageData.width
