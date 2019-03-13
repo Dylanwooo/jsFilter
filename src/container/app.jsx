@@ -12,7 +12,7 @@ import Revert from './../lib/revert'
 import Opacity from './../lib/opacity'
 import Binary from './../lib/binary'
 import rgba from './../lib/rgba'
-
+import Convolution from './../lib/convolution'
 import './app.scss'
 let rawImage
 const ua = window.navigator.userAgent
@@ -66,7 +66,6 @@ class App extends Component {
 
         }
         canvas.addEventListener('mousemove', this.canvasPicker)
-
     }
 
     ctxDrawImg = (ori, w, h) => {
@@ -223,6 +222,17 @@ class App extends Component {
         ctx.putImageData(processImg, 0, 0)
     }
 
+    handleConvolution = () => {
+        const canvas = document.getElementById('canvas')
+        const ctx = canvas.getContext('2d')
+
+        let _imgData = this.state.imgData
+        const kernel = [-1, 0, 1, -2, 0, 2, -1, 0, 1]
+        const processImg = Convolution(_imgData, kernel)
+        ctx.putImageData(processImg, 0, 0)
+
+    }
+
     // 读取图像元信息
     handleFileChange = (e) => {
 
@@ -262,7 +272,7 @@ class App extends Component {
         const form = new FormData()
         console.log(form)
     }
-    
+
     render () {
         
         const { width, height, radio, color } = this.state
@@ -289,6 +299,7 @@ class App extends Component {
                     <button onClick={this.handleOpacity}>半透明</button>
                     <button onClick={this.handleBinary}>二值化</button>
                     <button onClick={this.handleRGBA}>仿rgba</button>
+                    <button onClick={this.handleConvolution}>卷积运算</button>
                     <button onClick={this.handleBack}>原图</button>
                     <div>
                         <input type="file" accept="image/png, image/jpeg, image/jpg" onChange={this.handleFileChange} />
@@ -298,8 +309,9 @@ class App extends Component {
                     </div>
                     <p style={colorPicker}>颜色选择器</p>
                     <div className="canvas-wrap">
-                        <canvas id = "canvas" width={width*radio} height={height*radio} style={canvasStyle} ></canvas>
+                        <canvas id = "canvas" width={width*radio} height={height*radio} style={canvasStyle} />
                     </div>
+
                 </div>
             </div>
         )
